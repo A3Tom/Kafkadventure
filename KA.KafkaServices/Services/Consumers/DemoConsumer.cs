@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Text;
 
-namespace KA.Application.Services;
+namespace KA.Application.Services.Consumers;
 public class DemoConsumer : IHostedService
 {
     private ILogger<DemoConsumer> _logger;

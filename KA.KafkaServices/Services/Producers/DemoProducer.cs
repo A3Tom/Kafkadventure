@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace KA.Application.Services;
+namespace KA.Application.Services.Producers;
 public class DemoProducer : IHostedService
 {
     private ILogger<DemoProducer> _logger;

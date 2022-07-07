@@ -1,4 +1,5 @@
-﻿using KA.Application.Services;
+﻿using KA.Application.Services.Consumers;
+using KA.Application.Services.Producers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

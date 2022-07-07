@@ -20,7 +20,7 @@ public class DemoProducer : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        for (int i = 0; i < 20; ++i)
+        for (int i = 1; i <= 20; ++i)
         {
             var value = $"Fanny B{string.Join("", Enumerable.Repeat("a", i))}ws";
             _logger.LogInformation(value);

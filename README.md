@@ -17,5 +17,5 @@ This should be heavy sound, first off get a wee Kafka container on the go
 Compile the .Net solution n run it.
 Don't be a shitebag; get the cli out
 
-`dotnet build`
+`dotnet build`  
 `dotnet watch --project KA.KafkaOrchestrator\KA.KafkaOrchestrator_Demo.csproj`

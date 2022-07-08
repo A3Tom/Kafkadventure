@@ -11,8 +11,6 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, collection) =>
     {
-        //collection.AddHostedService<DemoConsumer>();
-        //collection.AddHostedService<DemoProducer>();
         collection.AddHostedService<FrogSightingConsumer>();
         collection.AddHostedService<DragonSightingConsumer>();
         collection.AddHostedService<SlothSightingConsumer>();

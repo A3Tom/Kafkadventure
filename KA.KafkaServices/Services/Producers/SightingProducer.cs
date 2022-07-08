@@ -36,7 +36,7 @@ public class SightingProducer : IHostedService
             }, cancellationToken);
 
             _producer.Flush(TimeSpan.FromSeconds(2));
-            Thread.Sleep(2999);
+            Thread.Sleep(1800);
         }
     }
 

@@ -9,9 +9,14 @@
 	<ItemGroup>
 		<PackageReference Include="Confluent.Kafka" Version="1.9.0" />
 		<PackageReference Include="kafka-sharp" Version="1.4.3" />
+		<PackageReference Include="MediatR" Version="10.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\KA.Domain\KA.Domain.csproj" />
 	</ItemGroup>
 	
 </Project>

@@ -15,5 +15,5 @@ public class DragonSightingConsumer : SightingConsumerBase
         _sighting.Animal == AnimalEnum.DRAGON;
 
     public override void Consume() => 
-        _logger.LogInformation($"Here, fuck that; {_messageReceived.Subject}");
+        _logger.LogWarning($"Here, fuck that; {_messageReceived.Subject}");
 }

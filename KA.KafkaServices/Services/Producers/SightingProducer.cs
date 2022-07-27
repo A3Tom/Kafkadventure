@@ -1,35 +1,33 @@
 ﻿using Confluent.Kafka;
 using KA.Application.UseCases.GenerateNonsenseEvent;
-using KA.Domain.Dtos;
+using KA.Domain.Consts;
 using MediatR;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace KA.Application.Services.Producers;
 public class SightingProducer : IHostedService
 {
-    private ILogger<SightingProducer> _logger;
     private IProducer<Null, string> _producer;
 
     private readonly IMediator _mediator;
 
-    public SightingProducer(ILogger<SightingProducer> logger, IMediator mediator)
+    public SightingProducer(IMediator mediator)
     {
-        _logger = logger;
-        var config = new ProducerConfig()
-        {
-            BootstrapServers = "localhost:9092"
-        };
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+
+        var config = BuildProducerConfig();
         _producer = new ProducerBuilder<Null, string>(config).Build();
-        _mediator = mediator;
     }
+
+    private ProducerConfig BuildProducerConfig() => new() { BootstrapServers = Server.SEED_SERVER };
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         while (true)
         {
-            var newEvent = await _mediator.Send(new GenerateNonsenseEvent.Request());
+            var newEvent = await _mediator.Send(new GenerateNonsenseEvent.Request(), cancellationToken);
+
             await _producer.ProduceAsync(newEvent.Topic, new Message<Null, string>()
             {
                 Value = JsonSerializer.Serialize(newEvent)

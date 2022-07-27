@@ -16,18 +16,23 @@ public abstract class SightingConsumerBase : IHostedService
 
     public SightingConsumerBase()
     {
-        _cluster = new ClusterClient(new Configuration
-        {
-            Seeds = "localhost:9092"
-        }, new ConsoleLogger());
+        _cluster = BuildClusterClient();
     }
+
+    private static ClusterClient BuildClusterClient() => new ( 
+            new Configuration { Seeds = Server.SEED_SERVER }, 
+            new ConsoleLogger()
+        );
 
     public abstract void Consume();
     public abstract bool ConsumerCriteriaMet();
 
+    private bool BaseCriteriaMet() =>
+        _sighting?.Count > 1;
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _cluster.ConsumeFromLatest(Topics.SIGHTINGS);
+        _cluster.ConsumeFromLatest(Topic.SIGHTINGS);
 
         _cluster.MessageReceived += HandleMessageReceived();
     }
@@ -36,10 +41,13 @@ public abstract class SightingConsumerBase : IHostedService
     {
         return record =>
         {
+            if (record is null)
+                return;
+
             _messageReceived = JsonSerializer.Deserialize<EventDto>(Encoding.UTF8.GetString((byte[])record.Value));
             _sighting = JsonSerializer.Deserialize<AnimalSightingDto>(_messageReceived.MeatNTatties.ToString());
 
-            if (ConsumerCriteriaMet())
+            if (BaseCriteriaMet() && ConsumerCriteriaMet())
                 Consume();
         };
     }

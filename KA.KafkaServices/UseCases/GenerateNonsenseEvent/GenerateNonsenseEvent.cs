@@ -1,4 +1,5 @@
-﻿using KA.Domain.Dtos;
+﻿using KA.Domain.Consts;
+using KA.Domain.Dtos;
 using KA.Domain.Enums;
 using KA.Domain.Extensions;
 using MediatR;
@@ -10,16 +11,16 @@ public class GenerateNonsenseEvent : IRequestHandler<GenerateNonsenseEvent.Reque
     public Task<EventDto> Handle(Request request, CancellationToken cancellationToken) => 
         Task.Run(() => BuildRandomEvent());
 
-    public EventDto BuildRandomEvent()
+    public static EventDto BuildRandomEvent()
     {
-        var animal = (AnimalEnum)Random.Shared.Next(0, 5);
-        var loch = (LochEnum)Random.Shared.Next(0, 3);
-        var hings = Random.Shared.Next(0, 20);
+        var animal = (AnimalEnum)Random.Shared.Next(0, Enum.GetValues<AnimalEnum>().Length);
+        var loch = (LochEnum)Random.Shared.Next(0, Enum.GetValues<LochEnum>().Length);
+        var hings = Random.Shared.Next(0, Server.MAX_SIGHTINGS);
 
         var subjectLine = BuildSubjectLine(animal, loch, hings);
         var sightingDto = BuildSightingDto(animal, loch, hings, "Auld pishy Tam");
 
-        return new EventDto("sightings", subjectLine, DateTime.UtcNow, sightingDto);
+        return new EventDto(Topic.SIGHTINGS, subjectLine, DateTime.UtcNow, sightingDto);
     }
 
     private static AnimalSightingDto BuildSightingDto(AnimalEnum animal, LochEnum loch, int hings, string reportedBy)

@@ -14,6 +14,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
         collection.AddHostedService<FrogSightingConsumer>();
         collection.AddHostedService<DragonSightingConsumer>();
         collection.AddHostedService<SlothSightingConsumer>();
+        collection.AddHostedService<LlamaSightingConsumer>();
         collection.AddHostedService<SightingProducer>();
 
         collection.AddMediatR(typeof(GenerateNonsenseEvent));

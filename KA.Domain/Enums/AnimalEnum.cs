@@ -11,5 +11,8 @@ public enum AnimalEnum
     DRAGON = 1,
 
     [Description("Sloth")]
-    SLOTH = 2
+    SLOTH = 2,
+
+    [Description("Llama")]
+    LLAMA = 3
 }

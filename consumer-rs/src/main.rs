@@ -26,16 +26,16 @@ struct CustomContext;
 impl ClientContext for CustomContext {}
 
 impl ConsumerContext for CustomContext {
-    fn pre_rebalance(&self, rebalance: &Rebalance) {
-        info!("Pre rebalance {:?}", rebalance);
+    fn pre_rebalance(&self, _: &Rebalance) {
+        // info!("Pre rebalance {:?}", rebalance);
     }
 
-    fn post_rebalance(&self, rebalance: &Rebalance) {
-        info!("Post rebalance {:?}", rebalance);
+    fn post_rebalance(&self, _: &Rebalance) {
+        // info!("Post rebalance {:?}", rebalance);
     }
 
-    fn commit_callback(&self, result: KafkaResult<()>, _offsets: &TopicPartitionList) {
-        info!("Committing offsets: {:?}", result);
+    fn commit_callback(&self, _: KafkaResult<()>, _offsets: &TopicPartitionList) {
+        // info!("Committing offsets: {:?}", result);
     }
 }
 
@@ -96,10 +96,9 @@ fn build_kafka_consumer(brokers: &str, group_id: &str, topics: &[&str]) -> Loggi
     return consumer
 }
 
-
 fn output_kafka_message_to_websocket(tx: &Sender<String>, payload: &str, m :&BorrowedMessage)
 {
-    tx.send(format_output_message(payload, m));
+    let _ = tx.send(format_output_message(payload, m));
 }
 
 fn format_output_message(payload: &str, m :&BorrowedMessage) -> String
@@ -149,8 +148,8 @@ fn print_kafka_version()
     info!("rd_kafka_version: 0x{:08x}, {}", version_n, version_s);
 }
 
-fn with_receiver(clients: Receiver<String>) -> impl Filter<Extract = (Receiver<String>,), Error = Infallible> + Clone {
-    warp::any().map(move || clients.clone())
+fn with_receiver(rx: Receiver<String>) -> impl Filter<Extract = (Receiver<String>,), Error = Infallible> + Clone {
+    warp::any().map(move || rx.clone())
 }
 
 fn with_clients(clients: Clients) -> impl Filter<Extract = (Clients,), Error = Infallible> + Clone {

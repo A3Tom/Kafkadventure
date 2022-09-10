@@ -6,9 +6,10 @@ use uuid::Uuid;
 use warp::ws::{Message, WebSocket};
 
 
+#[allow(unused_variables)]
 pub async fn client_connection(ws: WebSocket, clients: Clients, mut rx: Receiver<String>) {
     println!("establishing client connection... {:?}", ws);
-    let (client_ws_sender, client_ws_rcv) = ws.split();
+    let (client_ws_sender, _) = ws.split();
     let (client_sender, client_rcv) = mpsc::unbounded_channel();
     let client_rcv = UnboundedReceiverStream::new(client_rcv);
     tokio::task::spawn(client_rcv.forward(client_ws_sender).map(|result| {
@@ -16,41 +17,38 @@ pub async fn client_connection(ws: WebSocket, clients: Clients, mut rx: Receiver
             println!("error sending websocket msg: {}", e);
         }
     }));
-    let uuid = Uuid::new_v4().to_string();
+    let client_id = Uuid::new_v4().to_string();
     let new_client = Client {
-        client_id: uuid.clone(),
+        client_id: client_id.clone(),
         sender: Some(client_sender),
     };
 
-    clients.lock().await.insert(uuid.clone(), new_client);
+    println!("Client [{}] added", &client_id);
+    clients.lock().await.insert(client_id.clone(), new_client);
 
     while rx.changed().await.is_ok() {
-        let message: String;
-        {
-            let y = rx.borrow();
-            message = y.to_owned();
-        }
+        let msg = rx.borrow().to_owned().to_string();
+        forward_kafka_message(msg, &clients, &client_id).await;
 
-        client_msg("kafka", message.to_string(), &clients).await;
+        // if(client disconnects)
+        // {
+        //     clients.lock().await.remove(&client_id);
+        //     println!("client [{}] disconnected", client_id);
+        // }
     }
     
-    clients.lock().await.remove(&uuid);
-    println!("{} disconnected", uuid);
+    
 }
 
-async fn client_msg(client_id: &str, msg: String, clients: &Clients) {
-    println!("received message from {}: {:}", client_id, msg);
-}
-
-async fn send_msg(client_id: &str, clients: &Clients) {
+async fn forward_kafka_message(msg: String, clients: &Clients, client_id: &str) {
     let locked = clients.lock().await;
-        match locked.get(client_id) {
-            Some(v) => {
-                if let Some(sender) = &v.sender {
-                    println!("sending pong");
-                    let _ = sender.send(Ok(Message::text("pong")));
-                }
+    match locked.get(client_id) {
+        Some(v) => {
+            if let Some(sender) = &v.sender {
+                println!("notifiying socket client {} of new message from kafka", client_id);
+                let _ = sender.send(Ok(Message::text(&msg)));
             }
-            None => return,
         }
+        None => return,
+    }
 }

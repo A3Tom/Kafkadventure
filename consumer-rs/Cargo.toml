@@ -1,0 +1,75 @@
+[package]
+name = "consumer-rs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rdkafka-sys = { version = "4.2.0", default-features = false }
+rdkafka = { version = "0.28.0", features = ["cmake-build"] }
+futures-channel = "0.3.0"
+futures-executor = { version = "0.3.0", optional = true }
+futures-util = { version = "0.3.0", default-features = false }
+libc = "0.2.0"
+log = "0.4.8"
+serde = { version = "1.0.0", features = ["derive"] }
+serde_derive = "1.0.0"
+slab = "0.4"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread", "time", "full"], optional = true }
+tokio-stream = "0.1.6"
+tracing = { version = "0.1.30", optional = true }
+backoff = "0.1.5"
+chrono = "0.4.0"
+clap = "2.18.0"
+env_logger = "0.9.0"
+futures = "0.3.0"
+hdrhistogram = "7.0.0"
+maplit = "1.0.2"
+rand = "0.3.15"
+regex = "1.1.6"
+smol = "1.2.4"
+async-std = { version = "1.9.0", features = ["attributes"] }
+warp = "0.3"
+serde_json = "1.0"
+
+[dependencies.uuid]
+version = "1.1.2"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]
+
+[dev-dependencies]
+async-std = { version = "1.9.0", features = ["attributes"] }
+backoff = "0.1.5"
+chrono = "0.4.0"
+clap = "2.18.0"
+env_logger = "0.9.0"
+futures = "0.3.0"
+hdrhistogram = "7.0.0"
+maplit = "1.0.2"
+rand = "0.3.15"
+regex = "1.1.6"
+smol = "1.2.4"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread", "time"] }
+
+[features]
+default = ["libz", "tokio"]
+naive-runtime = ["futures-executor"]
+cmake-build = ["rdkafka-sys/cmake-build"]
+cmake_build = ["rdkafka-sys/cmake_build"]
+dynamic-linking = ["rdkafka-sys/dynamic-linking"]
+dynamic_linking = ["rdkafka-sys/dynamic_linking"]
+ssl = ["rdkafka-sys/ssl"]
+ssl-vendored = ["rdkafka-sys/ssl-vendored"]
+gssapi = ["rdkafka-sys/gssapi"]
+gssapi-vendored = ["rdkafka-sys/gssapi-vendored"]
+sasl = ["rdkafka-sys/sasl"]
+libz = ["rdkafka-sys/libz"]
+libz-static = ["rdkafka-sys/libz-static"]
+zstd = ["rdkafka-sys/zstd"]
+zstd-pkg-config = ["rdkafka-sys/zstd-pkg-config"]
+external-lz4 = ["rdkafka-sys/external-lz4"]
+external_lz4 = ["rdkafka-sys/external_lz4"]

@@ -11,7 +11,7 @@ On a quest to discover wit mad mysteries lurk in the depths of event streaming
 ### Languages involved
  - [X] C#
  - [X] Python
- - [ ] Rust
+ - [X] Rust
 
 ### Gettin Started
 
@@ -23,7 +23,7 @@ Now pick yer tech stack of choice
 
 <details>
     <summary><h4>C# .Net 6</h4></summary>
-    Don't be a shitebag; get the cli out
+    Don't be a shitebag; get the cli out  
     
     `cd .\dotnet`
 
@@ -33,7 +33,7 @@ Now pick yer tech stack of choice
 
 <details>
     <summary><h4>Python</h4></summary>
-    Optional but recommended: create a new venv first
+    Optional but recommended: create a new venv first  
 
     `cd .\python`
 

@@ -269,3 +269,6 @@ src/Test Endpoint Calls/.env
 /src/Saubian.SilverSickle/Properties
 /src/Saubian.TamOShanter/Properties
 /src/Saubian.EmailPoller/celestial-feat-353623-0a11073f3884.json
+scaffolding/*
+**/target/*
+[Cc]argo.lock

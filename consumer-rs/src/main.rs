@@ -6,11 +6,11 @@ use rdkafka::config::{ClientConfig, RDKafkaLogLevel};
 use rdkafka::consumer::stream_consumer::StreamConsumer;
 use rdkafka::consumer::{CommitMode, Consumer, ConsumerContext, Rebalance};
 use rdkafka::error::KafkaResult;
-use rdkafka::message::{Message as KafkaMessage};
+use rdkafka::message::{Message as KafkaMessage, BorrowedMessage};
 use rdkafka::topic_partition_list::TopicPartitionList;
 use rdkafka::util::get_rdkafka_version;
 use std::{collections::HashMap, convert::Infallible, sync::Arc};
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{mpsc, Mutex, watch, watch::{Receiver, Sender}};
 use warp::{ws::Message as WarpMessage, Filter, Rejection};
 
 use crate::config::{Config, handle_config};
@@ -50,24 +50,11 @@ type Result<T> = std::result::Result<T, Rejection>;
 // A type alias with your custom consumer can be created for convenience.
 type LoggingConsumer = StreamConsumer<CustomContext>;
 
-async fn consume_and_print(brokers: &str, group_id: &str, topics: &[&str]) {
-    let context = CustomContext;
+async fn consume_and_print(brokers: &str, group_id: &str, topics: &[&str], transmitter: Sender<String>) {
+    print_kafka_version();
 
-    let consumer: LoggingConsumer = ClientConfig::new()
-        .set("group.id", group_id)
-        .set("bootstrap.servers", brokers)
-        .set("enable.partition.eof", "false")
-        .set("session.timeout.ms", "6000")
-        .set("enable.auto.commit", "true")
-        //.set("statistics.interval.ms", "30000")
-        //.set("auto.offset.reset", "smallest")
-        .set_log_level(RDKafkaLogLevel::Debug)
-        .create_with_context(context)
-        .expect("Consumer creation failed");
+    let consumer: LoggingConsumer = build_kafka_consumer(brokers, group_id, topics);
 
-    consumer
-        .subscribe(&topics.to_vec())
-        .expect("Can't subscribe to specified topics");
 
     loop {
         match consumer.recv().await {
@@ -81,12 +68,49 @@ async fn consume_and_print(brokers: &str, group_id: &str, topics: &[&str]) {
                         ""
                     }
                 };
-                info!("key: '{:?}', payload: '{}', topic: {}, partition: {}, offset: {}, timestamp: {:?}",
-                        m.key(), payload, m.topic(), m.partition(), m.offset(), m.timestamp());
+                
+                output_kafka_message_to_websocket(&transmitter, payload, &m);
                 consumer.commit_message(&m, CommitMode::Async).unwrap();
             }
         };
     }
+}
+
+fn build_kafka_consumer(brokers: &str, group_id: &str, topics: &[&str]) -> LoggingConsumer
+{
+    let context = CustomContext;
+
+    let consumer: LoggingConsumer = ClientConfig::new()
+        .set("group.id", group_id)
+        .set("bootstrap.servers", brokers)
+        .set("enable.partition.eof", "false")
+        .set("session.timeout.ms", "6000")
+        .set("enable.auto.commit", "true")
+        .set_log_level(RDKafkaLogLevel::Debug)
+        .create_with_context(context)
+        .expect("Consumer creation failed");
+
+    consumer.subscribe(&topics.to_vec())
+        .expect("Can't subscribe to specified topics");
+
+    return consumer
+}
+
+
+fn output_kafka_message_to_websocket(tx: &Sender<String>, payload: &str, m :&BorrowedMessage)
+{
+    tx.send(format_output_message(payload, m));
+}
+
+fn format_output_message(payload: &str, m :&BorrowedMessage) -> String
+{
+    format!("key: '{:?}', payload: '{}', topic: {}, partition: {}, offset: {}, timestamp: {:?}",
+        m.key(), 
+        payload, 
+        m.topic(), 
+        m.partition(), 
+        m.offset(), 
+        m.timestamp())
 }
 
 #[tokio::main]
@@ -95,31 +119,38 @@ async fn main() {
     let brokers = format!("{}:{}",config.kafka_address, config.kafka_port);
     let group_id = &config.group_id;
     let topics = vec![config.topic.as_str()];
-
-    setup_logger(true, None);
-    
-    println!("Configuring websocket route");
+    let (tx, rx) = watch::channel("remo".to_string());
 
     let clients: Clients = Arc::new(Mutex::new(HashMap::new()));
     let ws_route = warp::path("ws")
         .and(warp::ws())
         .and(with_clients(clients.clone()))
+        .and(with_receiver(rx))
         .and_then(handlers::ws_handler);
-
+        
     let routes = ws_route.with(warp::cors().allow_any_origin());
-    println!("Starting server");
-
-    let (version_n, version_s) = get_rdkafka_version();
-    info!("rd_kafka_version: 0x{:08x}, {}", version_n, version_s);
-    
-    let rt = tokio::runtime::Runtime::new().unwrap();
-
     let websocket_task = async move {
+        println!("Starting server");
+        println!("Configuring websocket route");
         warp::serve(routes).run(([127, 0, 0, 1], 8000)).await
     };
-    rt.spawn(websocket_task);
 
-    consume_and_print(&brokers, group_id, &topics).await;
+    setup_logger(true, None);
+    
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    rt.spawn(websocket_task);
+    
+    consume_and_print(&brokers, group_id, &topics, tx).await;
+}
+
+fn print_kafka_version()
+{
+    let (version_n, version_s) = get_rdkafka_version();
+    info!("rd_kafka_version: 0x{:08x}, {}", version_n, version_s);
+}
+
+fn with_receiver(clients: Receiver<String>) -> impl Filter<Extract = (Receiver<String>,), Error = Infallible> + Clone {
+    warp::any().map(move || clients.clone())
 }
 
 fn with_clients(clients: Clients) -> impl Filter<Extract = (Clients,), Error = Infallible> + Clone {

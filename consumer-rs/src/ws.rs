@@ -6,7 +6,6 @@ use uuid::Uuid;
 use warp::ws::{Message, WebSocket};
 
 
-#[allow(unused_variables)]
 pub async fn client_connection(ws: WebSocket, clients: Clients, mut rx: Receiver<String>) {
     println!("establishing client connection... {:?}", ws);
     let (client_ws_sender, _) = ws.split();

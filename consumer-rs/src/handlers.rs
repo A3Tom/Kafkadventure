@@ -1,4 +1,4 @@
-use crate::{ws, Clients, Result};
+use crate::{ws, models::{Clients, Result}};
 use tokio::sync::watch::Receiver;
 use warp::Reply;
 

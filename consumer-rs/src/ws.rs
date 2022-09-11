@@ -1,4 +1,4 @@
-use crate::{Client, Clients};
+use crate::{models::Client, Clients};
 use futures::{FutureExt, StreamExt};
 use tokio::sync::{mpsc, watch::Receiver};
 use tokio_stream::wrappers::UnboundedReceiverStream;

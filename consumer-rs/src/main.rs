@@ -1,4 +1,3 @@
-
 use std::{collections::HashMap, convert::Infallible, sync::Arc};
 use tokio::sync::{Mutex, watch, watch::Receiver};
 use models::Clients;
@@ -23,18 +22,19 @@ async fn main() {
     let topics = vec![config.topic.as_str()];
     let (tx, rx) = watch::channel("remo".to_string());
 
-    let clients: Clients = Arc::new(Mutex::new(HashMap::new()));
-    let ws_route = warp::path("ws")
-        .and(warp::ws())
-        .and(with_clients(clients.clone()))
-        .and(with_receiver(rx))
-        .and_then(handlers::ws_handler);
-        
-    let routes = ws_route.with(warp::cors().allow_any_origin());
     let websocket_task = async move {
+        println!("Configuring websocket routes");
+
+        let clients: Clients = Arc::new(Mutex::new(HashMap::new()));
+        let ws_route = warp::path(config.ws_path)
+            .and(warp::ws())
+            .and(with_clients(clients.clone()))
+            .and(with_receiver(rx))
+            .and_then(handlers::ws_handler);
+        let routes = ws_route.with(warp::cors().allow_any_origin());
+
         println!("Starting server");
-        println!("Configuring websocket route");
-        warp::serve(routes).run(([127, 0, 0, 1], 8000)).await
+        warp::serve(routes).run((config.ws_host, config.ws_port)).await
     };
 
     setup_logger(true, None);

@@ -8,9 +8,10 @@ On a quest to discover wit mad mysteries lurk in the depths of event streaming
 - Visual Studio / msbuild
 - Docker
 
-### Languages involved
- - [X] C#
+### Tech Stack Involved
+ - [ ] React
  - [X] Python
+ - [X] C#
  - [X] Rust
 
 ### Gettin Started
@@ -25,18 +26,34 @@ Now pick yer tech stack of choice
     <summary><h4>C# .Net 6</h4></summary>
     Don't be a shitebag; get the cli out  
     
-    `cd .\dotnet`
+    cd .\dotnet
+    dotnet watch --project KA.KafkaOrchestrator\KA.KafkaOrchestrator_Demo.csproj
+</details>
 
-    `dotnet build`  
-    `dotnet watch --project KA.KafkaOrchestrator\KA.KafkaOrchestrator_Demo.csproj`
+<details>
+    <summary><h4>Rust</h4></summary>
+    Get those sockets spoutin
+
+    cd .\consumer-rs
+
+    cargo build
+    cargo run
 </details>
 
 <details>
     <summary><h4>Python</h4></summary>
-    Optional but recommended: create a new venv first  
+    Optional but recommended: create a new venv first
 
-    `cd .\python`
+    cd .\python
 
-    `pip install kafka-python`  
-    `dotnet watch --project KA.KafkaOrchestrator\KA.KafkaOrchestrator_Demo.csproj`
+    pip install kafka-python
+    py omni_listener.py
 </details>
+
+### Todo list
+- Build a web interface for the web socket messages
+  - Parse the lat/long on a map
+- Create a better getting started mechanism
+- Actually handle disconnects from the socket listeners
+- Find a better use for python in this project
+- Generate geofenced coordinates for events

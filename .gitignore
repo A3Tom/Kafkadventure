@@ -274,3 +274,4 @@ scaffolding/*
 [Cc]argo.lock
 
 **/package-lock.json
+.env

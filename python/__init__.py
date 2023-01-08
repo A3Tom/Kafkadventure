@@ -42,7 +42,6 @@ def run() -> None:
         decodedEvent: Dict[str, str] = json.loads(bytes.decode(event.value))
         entity: SightingEvent = translateEventToEntity(decodedEvent)
         insertSightingToDatabase(entity.__dict__)
-        print(entity)
 
 if __name__ == '__main__':
     run()

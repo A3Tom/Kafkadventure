@@ -1,6 +1,8 @@
+autopep8==2.0.1
 kafka-python==2.0.2
 mypy==0.991
 mypy-extensions==0.4.3
+pycodestyle==2.10.0
 pymongo==4.3.3
 python-dotenv==0.21.0
 typing_extensions==4.4.0

@@ -1,14 +1,14 @@
 import json
 from typing import Collection, Dict
 
-import datastore
+import client_builder
 from kafka import KafkaConsumer
 from models import SightingEvent
 from pymongo import MongoClient
 from settings import KafkaSettings, MongoDBSettings
 
-consumer: KafkaConsumer = datastore.build_kafka_consumer()
-mongo_client: MongoClient = datastore.build_database_client()
+consumer: KafkaConsumer = client_builder.build_kafka_consumer()
+mongo_client: MongoClient = client_builder.build_database_client()
 
 kafka_settings: KafkaSettings = KafkaSettings()
 mongo_settings: MongoDBSettings = MongoDBSettings()

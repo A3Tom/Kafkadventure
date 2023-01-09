@@ -17,3 +17,4 @@ def build_kafka_consumer() -> KafkaConsumer:
         bootstrap_servers=[f"{settings.Server}:{settings.Port}"], 
         auto_offset_reset="earliest"
     )
+    

@@ -13,6 +13,9 @@ On a quest to discover wit mad mysteries lurk in the depths of event streaming
  - [X] Python
  - [X] C#
  - [X] Rust
+ - [X] Kafka
+ - [X] MongoDB
+ - [] ElasticSearch
 
 ### Gettin Started
 

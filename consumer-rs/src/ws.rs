@@ -27,16 +27,20 @@ pub async fn client_connection(ws: WebSocket, clients: Clients, mut rx: Receiver
 
     while rx.changed().await.is_ok() {
         let msg = rx.borrow().to_owned().to_string();
+
         forward_kafka_message(msg, &clients, &client_id).await;
 
-        // if(client disconnects)
-        // {
-        //     clients.lock().await.remove(&client_id);
-        //     println!("client [{}] disconnected", client_id);
-        // }
+        if(client_has_disconnected())
+        {
+            clients.lock().await.remove(&client_id);
+            println!("client [{}] disconnected", client_id);
+        }
     }
-    
-    
+}
+
+
+fn client_has_disconnected() -> bool{
+    return false
 }
 
 async fn forward_kafka_message(msg: String, clients: &Clients, client_id: &str) {

@@ -17,5 +17,8 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
         collection.AddHostedService<LlamaSightingConsumer>();
         collection.AddHostedService<SightingProducer>();
 
-        collection.AddMediatR(typeof(GenerateNonsenseEvent));
+        collection.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssemblyContaining<GenerateNonsenseEvent>();
+        });
     });

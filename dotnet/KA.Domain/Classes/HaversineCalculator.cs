@@ -13,7 +13,7 @@ public static class HaversineCalculator
         var deltaLong = longRad_2 - longRad_1;
 
         var havCentralAngle = CalculateHaversine(deltaLat, deltaLong, latRad_1, latRad_2);
-        var centralAngleRad = 2 * Math.Atan2(Math.Sqrt(havCentralAngle), Math.Sqrt(1 - havCentralAngle));
+        var centralAngleRad = CalculateCentralAngleRadians(havCentralAngle);
 
         return centralAngleRad * EARTH_RADIUS_KM;
     }
@@ -29,4 +29,11 @@ public static class HaversineCalculator
                 * Math.Cos(latRad_2)
                 * Math.Pow(Math.Sin(deltaLong / 2), 2)
             );
+
+    private static double CalculateCentralAngleRadians(double havCentralAngle)
+        =>
+        2 * Math.Atan2(
+                Math.Sqrt(havCentralAngle),
+                Math.Sqrt(1 - havCentralAngle)
+        );
 }

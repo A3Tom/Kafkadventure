@@ -1,5 +1,5 @@
 ﻿namespace KA.Domain.Classes;
-public static class HaversineCalculator
+public static class SexantUtils
 {
     private const int EARTH_RADIUS_KM = 6371;
     public static double CalculateGreatCircleDistance(double Lat1, double Long1, double Lat2, double Long2)
